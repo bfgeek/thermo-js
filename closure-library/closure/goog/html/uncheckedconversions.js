@@ -24,6 +24,7 @@
  * or template systems.
  *
  * @visibility {//closure/goog/html:approved_for_unchecked_conversion}
+ * @visibility {//closure/goog/bin/sizetests:__pkg__}
  */
 
 
@@ -32,6 +33,7 @@ goog.provide('goog.html.uncheckedconversions');
 goog.require('goog.asserts');
 goog.require('goog.html.SafeHtml');
 goog.require('goog.html.SafeUrl');
+goog.require('goog.string');
 goog.require('goog.string.Const');
 
 
@@ -62,8 +64,13 @@ goog.require('goog.string.Const');
  */
 goog.html.uncheckedconversions.safeHtmlFromStringKnownToSatisfyTypeContract =
     function(justification, html, opt_dir) {
+  // unwrap() called inside an assert so that justification can be optimized
+  // away in production code.
   goog.asserts.assertString(goog.string.Const.unwrap(justification),
                             'must provide justification');
+  goog.asserts.assert(
+      goog.string.trim(goog.string.Const.unwrap(justification)).length > 0,
+      'must provide non-empty justification');
   return goog.html.SafeHtml.createSafeHtmlSecurityPrivateDoNotAccessOrElse_(
       html, opt_dir || null);
 };
@@ -93,7 +100,12 @@ goog.html.uncheckedconversions.safeHtmlFromStringKnownToSatisfyTypeContract =
  */
 goog.html.uncheckedconversions.safeUrlFromStringKnownToSatisfyTypeContract =
     function(justification, url) {
+  // unwrap() called inside an assert so that justification can be optimized
+  // away in production code.
   goog.asserts.assertString(goog.string.Const.unwrap(justification),
                             'must provide justification');
+  goog.asserts.assert(
+      goog.string.trim(goog.string.Const.unwrap(justification)).length > 0,
+      'must provide non-empty justification');
   return goog.html.SafeUrl.createSafeUrlSecurityPrivateDoNotAccessOrElse_(url);
 };

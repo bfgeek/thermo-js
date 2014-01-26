@@ -220,7 +220,7 @@ goog.ui.Dialog.prototype.titleTextEl_ = null;
  * @type {?string}
  * @private
  */
-goog.ui.Dialog.prototype.titleId_ = null;
+goog.ui.Dialog.prototype.titleTextId_ = null;
 
 
 /**
@@ -599,10 +599,12 @@ goog.ui.Dialog.prototype.createDom = function() {
   goog.asserts.assert(element, 'getElement() returns null');
 
   var dom = this.getDomHelper();
-  this.titleEl_ = dom.createDom('div',
-      {'className': goog.getCssName(this.class_, 'title'), 'id': this.getId()},
+  this.titleEl_ = dom.createDom('div', goog.getCssName(this.class_, 'title'),
       this.titleTextEl_ = dom.createDom(
-          'span', goog.getCssName(this.class_, 'title-text'), this.title_),
+          'span',
+          {'className': goog.getCssName(this.class_, 'title-text'),
+            'id': this.getId()},
+          this.title_),
       this.titleCloseEl_ = dom.createDom(
           'span', goog.getCssName(this.class_, 'title-close'))),
   goog.dom.append(element, this.titleEl_,
@@ -611,10 +613,18 @@ goog.ui.Dialog.prototype.createDom = function() {
       this.buttonEl_ = dom.createDom('div',
           goog.getCssName(this.class_, 'buttons')));
 
-  this.titleId_ = this.titleEl_.id;
+  // Make the close button behave correctly with screen readers. Note: this is
+  // only being added if the dialog is not decorated. Decorators are expected
+  // to add aria label, role, and tab indexing in their templates.
+  goog.a11y.aria.setRole(this.titleCloseEl_, goog.a11y.aria.Role.BUTTON);
+  goog.dom.setFocusableTabIndex(this.titleCloseEl_, true);
+  goog.a11y.aria.setLabel(this.titleCloseEl_,
+      goog.ui.Dialog.MSG_GOOG_UI_DIALOG_CLOSE_);
+
+  this.titleTextId_ = this.titleTextEl_.id;
   goog.a11y.aria.setRole(element, this.getPreferredAriaRole());
   goog.a11y.aria.setState(element, goog.a11y.aria.State.LABELLEDBY,
-      this.titleId_ || '');
+      this.titleTextId_ || '');
   // If setContent() was called before createDom(), make sure the inner HTML of
   // the content element is initialized.
   if (this.content_) {
@@ -663,29 +673,28 @@ goog.ui.Dialog.prototype.decorateInternal = function(element) {
         null, titleTextClass, this.titleEl_)[0];
     this.titleCloseEl_ = goog.dom.getElementsByTagNameAndClass(
         null, titleCloseClass, this.titleEl_)[0];
-    // Give the title an id if it doesn't already have one.
-    if (!this.titleEl_.id) {
-      this.titleEl_.id = this.getId();
-    }
   } else {
     // Create the title bar element and insert it before the content area.
     // This is useful if the element to decorate only includes a content area.
-    this.titleEl_ = this.getDomHelper().createDom('div',
-        {'className': titleClass, 'id': this.getId()});
+    this.titleEl_ = this.getDomHelper().createDom('div', titleClass);
     dialogElement.insertBefore(this.titleEl_, this.contentEl_);
   }
-  this.titleId_ = this.titleEl_.id;
 
   // Decorate or create the title text element.
   if (this.titleTextEl_) {
     this.title_ = goog.dom.getTextContent(this.titleTextEl_);
+    // Give the title text element an id if it doesn't already have one.
+    if (!this.titleTextEl_.id) {
+      this.titleTextEl_.id = this.getId();
+    }
   } else {
-    this.titleTextEl_ = this.getDomHelper().createDom('span', titleTextClass,
-        this.title_);
+    this.titleTextEl_ = goog.dom.createDom(
+        'span', {'className': titleTextClass, 'id': this.getId()});
     this.titleEl_.appendChild(this.titleTextEl_);
   }
+  this.titleTextId_ = this.titleTextEl_.id;
   goog.a11y.aria.setState(dialogElement, goog.a11y.aria.State.LABELLEDBY,
-      this.titleId_ || '');
+      this.titleTextId_ || '');
   // Decorate or create the title close element.
   if (!this.titleCloseEl_) {
     this.titleCloseEl_ = this.getDomHelper().createDom('span', titleCloseClass);
@@ -883,6 +892,17 @@ goog.ui.Dialog.prototype.setDraggerLimits_ = function(e) {
  * @private
  */
 goog.ui.Dialog.prototype.onTitleCloseClick_ = function(e) {
+  this.handleTitleClose_();
+};
+
+
+/**
+ * Performs the action of closing the dialog in response to the title close
+ * button being interacted with. General purpose method to be called by click
+ * and button event handlers.
+ * @private
+ */
+goog.ui.Dialog.prototype.handleTitleClose_ = function() {
   if (!this.hasTitleCloseButton_) {
     return;
   }
@@ -1078,6 +1098,9 @@ goog.ui.Dialog.prototype.onKey_ = function(e) {
       // If the target is a button and it's enabled, we can fire that button's
       // handler.
       key = target.name;
+    } else if (target == this.titleCloseEl_) {
+      // if the title 'close' button is in focus, close the dialog
+      this.handleTitleClose_();
     } else if (buttonSet) {
       // Try to fire the default button's handler (if one exists), but only if
       // the button is enabled.
@@ -1098,6 +1121,10 @@ goog.ui.Dialog.prototype.onKey_ = function(e) {
       close = this.dispatchEvent(
           new goog.ui.Dialog.Event(key, String(buttonSet.get(key))));
     }
+  } else if (target == this.titleCloseEl_ &&
+      e.keyCode == goog.events.KeyCodes.SPACE) {
+    // if the title 'close' button is in focus on 'SPACE,' close the dialog
+    this.handleTitleClose_();
   }
 
   if (close || hasHandler) {
@@ -1484,6 +1511,13 @@ goog.ui.Dialog.MSG_DIALOG_SAVE_ = goog.getMsg('Save');
  * @private
  */
 goog.ui.Dialog.MSG_DIALOG_CONTINUE_ = goog.getMsg('Continue');
+
+
+/**
+ * @desc Standard label for the dialog 'X' (close) button.
+ * @private
+ */
+goog.ui.Dialog.MSG_GOOG_UI_DIALOG_CLOSE_ = goog.getMsg('Close');
 
 
 /**
