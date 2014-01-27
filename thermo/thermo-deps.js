@@ -2,10 +2,10 @@
 // Please do not edit.
 goog.addDependency('../../../thermo/api.js', ['thermo.api'], ['thermo', 'thermo.View']);
 goog.addDependency('../../../thermo/eventdelegate.js', ['thermo.EventDelegate'], ['goog.asserts']);
-goog.addDependency('../../../thermo/eventdelegate_test.js', ['thermo.EventDelegate_test'], ['goog.testing.jsunit', 'goog.testing.recordFunction', 'thermo.EventDelegate']);
+goog.addDependency('../../../thermo/eventdelegate_test.js', ['thermo.EventDelegate_test'], ['goog.testing.jsunit', 'goog.testing.recordFunction', 'thermo', 'thermo.EventDelegate']);
 goog.addDependency('../../../thermo/model.js', ['thermo.Model'], []);
 goog.addDependency('../../../thermo/model_test.js', ['thermo.Model_test'], ['goog.testing.jsunit', 'goog.testing.recordFunction', 'thermo.Model']);
-goog.addDependency('../../../thermo/scheduler.js', ['thermo.Scheduler'], []);
+goog.addDependency('../../../thermo/scheduler.js', ['thermo.Scheduler'], ['goog.events']);
 goog.addDependency('../../../thermo/thermo.js', ['thermo'], ['thermo.EventDelegate', 'thermo.Scheduler']);
 goog.addDependency('../../../thermo/tmpl/lexer.js', ['thermo.tmpl.lexer'], ['goog.asserts']);
 goog.addDependency('../../../thermo/tmpl/lexer_test.js', ['thermo.tmpl.lexer_test'], ['goog.testing.jsunit', 'thermo.tmpl.lexer']);

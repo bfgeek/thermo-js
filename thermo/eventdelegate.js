@@ -5,6 +5,7 @@ goog.require('goog.asserts');
 
 
 /**
+ * The event delegate abstracts the event subsystem.
  * @param {!thermo.Scheduler} scheduler
  * @constructor
  * @struct

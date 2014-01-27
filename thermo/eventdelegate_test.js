@@ -2,6 +2,7 @@ goog.provide('thermo.EventDelegate_test');
 
 goog.require('goog.testing.jsunit');
 goog.require('goog.testing.recordFunction');
+goog.require('thermo');
 goog.require('thermo.EventDelegate');
 
 f1 = null;
@@ -27,7 +28,7 @@ function setUp() {
   document.body.appendChild(el2);
 
   // Setup event delegate.
-  delegate = new thermo.EventDelegate();
+  delegate = new thermo.EventDelegate(thermo.scheduler);
 }
 
 

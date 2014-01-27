@@ -33,6 +33,8 @@ python2.7 ../closure-library/closure/bin/build/closurebuilder.py \
   --compiler_flags="--jscomp_error=unknownDefines" \
   --compiler_flags="--jscomp_error=uselessCode" \
   --compiler_flags="--jscomp_error=visibility" \
+  --compiler_flags="--externs=../externs/web-animations.js" \
+  --compiler_flags="--js=../closure-library/closure/goog/deps.js" \
   > compiled.js
   # Flags which are in code, but don't work, may need to update compiler version.
   #--compiler_flags="--jscomp_error=checkEventfulObjectDisposal" \

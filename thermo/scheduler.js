@@ -1,5 +1,7 @@
 goog.provide('thermo.Scheduler');
 
+goog.require('goog.events');
+
 
 
 /**
@@ -11,6 +13,9 @@ thermo.Scheduler = function() {
   /** @private {boolean} */
   this.inTest_ = false;
 
+  /** @private {boolean} */
+  this.blockDomJobs_ = true;
+
   /** @private {thermo.Scheduler.PhaseType_} */
   this.phase_ = thermo.Scheduler.PhaseType_.END;
 
@@ -20,8 +25,8 @@ thermo.Scheduler = function() {
   /** @private {!Array.<function()>} */
   this.eventJobs_ = [];
 
-  /** @private {!Array.<function()>} */
-  this.animationJobs_ = []; // TODO change type of this.
+  /** @private {!Array.<function(): boolean>} */
+  this.animationJobs_ = [];
 
   /** @private {!Array.<function()>} */
   this.domReadJobs_ = [];
@@ -59,6 +64,15 @@ thermo.Scheduler.raf_ =
 
 
 /**
+ * @param {boolean} blockDomJobs Blocks everything after animation jobs to
+ *     ensure smooth animations.
+ */
+thermo.Scheduler.prototype.setBlockDomJobs = function(blockDomJobs) {
+  this.blockDomJobs_ = blockDomJobs;
+};
+
+
+/**
  * Requests an Event job be scheduled.
  * @param {function()} eventJob The event job.
  */
@@ -72,13 +86,40 @@ thermo.Scheduler.prototype.requestEvent = function(eventJob) {
 
 /**
  * Requests an Animation job be scheduled.
- * @param {function()} animationJob The animation job.
+ * @param {!TimedItem|!Player|function(): boolean} animJob The animation job.
  */
-thermo.Scheduler.prototype.requestAnimation = function(animationJob) {
-  this.animationJobs_.push(animationJob);
+thermo.Scheduler.prototype.requestAnimation = function(animJob) {
+  if (animJob instanceof TimedItem) {
+    // Wrap animation job within closure form.
+    this.animationJobs_.push(thermo.Scheduler.wrapAnimation_(animJob));
+  } else if (animJob instanceof Player) {
+    if (!animJob.source) return; // TODO understand why this is.
+    this.animationJobs_.push(thermo.Scheduler.wrapAnimation_(animJob.source));
+  } else {
+    this.animationJobs_.push(animJob);
+  }
   if (this.phase_ > thermo.Scheduler.PhaseType_.ANIMATION) {
     this.requestFrame_();
   }
+};
+
+
+/**
+ * Wraps the JS TimedItem within a closure.
+ * @param {!TimedItem} timedItem
+ * @return {function(): boolean}
+ * @private
+ */
+thermo.Scheduler.wrapAnimation_ = function(timedItem) {
+  var finished = false;
+
+  goog.events.listen(timedItem, ['cancel', 'end'], function() {
+    finished = true;
+  });
+
+  return function() {
+    return finished;
+  };
 };
 
 
@@ -159,10 +200,18 @@ thermo.Scheduler.prototype.run_ = function(time) {
   this.eventJobs_ = [];
 
   this.phase_ = phaseType.ANIMATION;
-  for (var i = 0; i < this.animationJobs_.length; i++) {
-    this.animationJobs_[i]();
+  var idx = this.animationJobs_.length;
+  while (idx--) {
+    if (this.animationJobs_[i]()) {
+      this.animationJobs_.splice(i, 1);
+    }
   }
-  this.animationJobs_ = [];
+
+  // Check if we've got an early opt-out enabled for
+  if (this.animationJobs_.length && this.blockDomJobs_) {
+    this.phase_ = phaseType.END;
+    return;
+  }
 
   this.phase_ = phaseType.DOM_READ;
   for (var i = 0; i < this.domReadJobs_.length; i++) {
@@ -175,6 +224,16 @@ thermo.Scheduler.prototype.run_ = function(time) {
     this.domWriteJobs_[i]();
   }
   this.domWriteJobs_ = [];
+
+  // Check that we've got no other jobs queued.
+  this.phase_ = phaseType.NON_USER;
+  if (!this.eventJobs_.length && !this.animationJobs_.length &&
+      !this.domReadJobs_.length && !this.domWriteJobs_.length) {
+    for (var i = 0; i < this.nonUserJobs_.length; i++) {
+      this.nonUserJobs_[i]();
+    }
+    this.nonUserJobs_ = [];
+  }
 
   this.phase_ = phaseType.END;
 };
