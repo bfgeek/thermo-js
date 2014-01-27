@@ -8,7 +8,8 @@ goog.require('thermo.View');
 
 /**
  * @param {!Object=} opt_data
- * @constructor */
+ * @constructor
+ */
 View = function(opt_data) {
   /** @private {Object} */
   this.data_ = opt_data || null;

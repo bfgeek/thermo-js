@@ -9,6 +9,7 @@ goog.require('goog.asserts');
  * @param {!thermo.Scheduler} scheduler
  * @constructor
  * @struct
+ * @export
  */
 thermo.EventDelegate = function(scheduler) {
   /** @private {!thermo.Scheduler} */
@@ -31,6 +32,7 @@ thermo.EventDelegate = function(scheduler) {
 /**
  * Adds a root element to capture events on.
  * @param {!Element} el
+ * @export
  */
 thermo.EventDelegate.prototype.addRoot = function(el) {
   this.roots_.push(el);
@@ -44,6 +46,7 @@ thermo.EventDelegate.prototype.addRoot = function(el) {
 /**
  * Removes a root element.
  * @param {!Element} el
+ * @export
  */
 thermo.EventDelegate.prototype.removeRoot = function(el) {
   var idx = this.roots_.indexOf(el);
@@ -70,6 +73,7 @@ thermo.EventDelegate.prototype.removeRoot = function(el) {
  * @param {boolean=} opt_sync If the handler should be triggered syncronously or
  *     wait for a frame.
  * @template S
+ * @export
  */
 thermo.EventDelegate.prototype.registerHandlers =
     function(handlers, scope, opt_sync) {

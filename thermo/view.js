@@ -9,6 +9,7 @@ goog.require('thermo.tmpl.render');
  * @param {!Object=} opt_data
  * @param {string=} opt_tmpl
  * @constructor
+ * @export
  */
 thermo.View = function(opt_data, opt_tmpl) {
   /** @private {!Object|undefined} */
@@ -37,6 +38,7 @@ thermo.View = function(opt_data, opt_tmpl) {
 /**
  * Renders the view with a parent.
  * @param {!Element} parentEl The parent element to attach to.
+ * @export
  */
 thermo.View.prototype.render = function(parentEl) {
   this.onAttach_();
@@ -52,6 +54,7 @@ thermo.View.prototype.render = function(parentEl) {
 /**
  * Renders the view before a sibling element.
  * @param {!Element} siblingEl The sibling to attach next to.
+ * @export
  */
 thermo.View.prototype.renderBefore = function(siblingEl) {
   this.onAttach_();
@@ -65,7 +68,10 @@ thermo.View.prototype.renderBefore = function(siblingEl) {
 };
 
 
-/** Removes the view from the DOM. */
+/**
+ * Removes the view from the DOM.
+ * @export
+ */
 thermo.View.prototype.remove = function() {
   this.onDetach_();
 
@@ -79,7 +85,10 @@ thermo.View.prototype.remove = function() {
 };
 
 
-/** @return {!Element} */
+/**
+ * @return {!Element}
+ * @export
+ */
 thermo.View.prototype.getElement = function() {
   return this.element_;
 };
@@ -88,6 +97,7 @@ thermo.View.prototype.getElement = function() {
 /**
  * @param {string} className The class name of the element.
  * @return {Element}
+ * @export
  */
 thermo.View.prototype.getElementByClass = function(className) {
   return this.element_ ?
@@ -95,13 +105,19 @@ thermo.View.prototype.getElementByClass = function(className) {
 };
 
 
-/** @return {thermo.View} */
+/**
+ * @return {thermo.View}
+ * @export
+ */
 thermo.View.prototype.getParent = function() {
   return this.parent_;
 };
 
 
-/** @protected @return {!Element} */
+/**
+ * @protected @return {!Element}
+ * @export
+ */
 thermo.View.prototype.createDom = function() {
   this.renderNode_ =
       thermo.tmpl.render.run(this.getTemplate(), this.tmplData_, this);
@@ -109,7 +125,10 @@ thermo.View.prototype.createDom = function() {
 };
 
 
-/** @return {string} */
+/**
+ * @return {string}
+ * @export
+ */
 thermo.View.prototype.getTemplate = function() {
   return goog.asserts.assert(this.tmpl_);
 };
@@ -121,6 +140,7 @@ thermo.View.prototype.getTemplate = function() {
  * this view.
  * @param {!thermo.View} child The child to add.
  * @param {!Element=} opt_element The element within this view to append to.
+ * @export
  */
 thermo.View.prototype.appendChild = function(child, opt_element) {
   var el = opt_element || this.getElement();
@@ -140,6 +160,7 @@ thermo.View.prototype.appendChild = function(child, opt_element) {
  * should be inserted before.
  * @param {!thermo.View} child The child to add.
  * @param {!Element} sibling The element to insert the child before.
+ * @export
  */
 thermo.View.prototype.insertChildBefore = function(child, sibling) {
   goog.asserts.assert(thermo.View.isDescendant_(this.getElement(), sibling) &&
@@ -190,6 +211,7 @@ thermo.View.isDescendant_ = function(parent, node) {
 /**
  * Remove a child from this view.
  * @param {!thermo.View} child The child to remove.
+ * @export
  */
 thermo.View.prototype.removeChild = function(child) {
   this.removeChildInternal(child);

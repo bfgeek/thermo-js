@@ -8,6 +8,7 @@ goog.require('goog.events');
  * The job scheduler.
  * @constructor
  * @struct
+ * @export
  */
 thermo.Scheduler = function() {
   /** @private {boolean} */
@@ -66,6 +67,7 @@ thermo.Scheduler.raf_ =
 /**
  * @param {boolean} blockDomJobs Blocks everything after animation jobs to
  *     ensure smooth animations.
+ * @export
  */
 thermo.Scheduler.prototype.setBlockDomJobs = function(blockDomJobs) {
   this.blockDomJobs_ = blockDomJobs;
@@ -75,6 +77,7 @@ thermo.Scheduler.prototype.setBlockDomJobs = function(blockDomJobs) {
 /**
  * Requests an Event job be scheduled.
  * @param {function()} eventJob The event job.
+ * @export
  */
 thermo.Scheduler.prototype.requestEvent = function(eventJob) {
   this.eventJobs_.push(eventJob);
@@ -87,6 +90,7 @@ thermo.Scheduler.prototype.requestEvent = function(eventJob) {
 /**
  * Requests an Animation job be scheduled.
  * @param {!TimedItem|!Player|function(): boolean} animJob The animation job.
+ * @export
  */
 thermo.Scheduler.prototype.requestAnimation = function(animJob) {
   if (animJob instanceof TimedItem) {
@@ -126,6 +130,7 @@ thermo.Scheduler.wrapAnimation_ = function(timedItem) {
 /**
  * Requests a DOM read job be scheduled.
  * @param {function()} domReadJob The DOM read job.
+ * @export
  */
 thermo.Scheduler.prototype.requestDomRead = function(domReadJob) {
   this.domReadJobs_.push(domReadJob);
@@ -138,6 +143,7 @@ thermo.Scheduler.prototype.requestDomRead = function(domReadJob) {
 /**
  * Requests a DOM write job be scheduled.
  * @param {function()} domWriteJob The DOM write job.
+ * @export
  */
 thermo.Scheduler.prototype.requestDomWrite = function(domWriteJob) {
   this.domWriteJobs_.push(domWriteJob);
@@ -150,6 +156,7 @@ thermo.Scheduler.prototype.requestDomWrite = function(domWriteJob) {
 /**
  * Requests a non-user job be scheduled.
  * @param {function()} nonUserJob The non-user job.
+ * @export
  */
 thermo.Scheduler.prototype.requestNonUser = function(nonUserJob) {
   this.nonUserJobs_.push(nonUserJob);

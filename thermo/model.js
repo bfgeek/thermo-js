@@ -2,7 +2,10 @@ goog.provide('thermo.Model');
 
 
 
-/** @constructor */
+/**
+ * @constructor
+ * @export
+ */
 thermo.Model = function() {
   /** @private {!Object.<!Array.<function(*,*)>>} */
   this.observers_ = {};
@@ -26,6 +29,7 @@ if (goog.DEBUG) {
  * @param {!Object=} opt_scope The optional scope to invoke the function in.
  * @param {string=} opt_id The id to use to unobserve with.
  * @template T
+ * @export
  */
 thermo.Model.prototype.observe = function(key, func, opt_scope, opt_id) {
   if (!this.observers_[key]) {
@@ -49,9 +53,10 @@ thermo.Model.prototype.observe = function(key, func, opt_scope, opt_id) {
 
 
 /**
- *
+ * Unobserves a property on the model by id.
  * @param {string} key
  * @param {string} id
+ * @export
  */
 thermo.Model.prototype.unobserveById = function(key, id) {
   var observer = this.observersById_[key][id];
