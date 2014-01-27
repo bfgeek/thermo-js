@@ -22,4 +22,11 @@ Web Animations
 directory: `web-animations-js`
 
 latest version: `rm -R web-animations-js/ & git clone https://github.com/web-animations/web-animations-js.git`
+latest version: `git pull
+
+observe-js
+----------
+directory: `observe-js`
+
+latest version: `rm -R observe-js/ & git clone https://github.com/Polymer/observe-js.git`
 latest version: `git pull`
