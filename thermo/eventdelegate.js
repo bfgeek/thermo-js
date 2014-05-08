@@ -61,7 +61,8 @@ thermo.EventDelegate.prototype.removeRoot = function(el) {
 
 
 /**
- * TODO
+ * Registers a set of handlers with the event delegate. The map is an event or
+ * gesture pair with a CSS selector.
  *
  * delegate.registerHandlers({
  *   'action .foo': this.onAction_,
@@ -108,6 +109,9 @@ thermo.EventDelegate.prototype.onEvent_ = function(evt) {
   var handlers = this.handlers_[evt.type];
   for (var i = 0; i < handlers.length; i++) {
     var h = handlers[i];
+
+    // NOTE(ikilpatrick): this target could potentially be cached, (in an LRU)
+    // for quick lookup skipping this for loop.
     var target = evt.target;
     if ((target['matches'] ||
         target.webkitMatchesSelector ||
