@@ -994,9 +994,9 @@ render.ForeachStmt.prototype.partialInsertRemoveChildNodes_ = function() {
   // Loop through slices updates DOM as we go.
   for (var i = 0; i < slices.length; i++) {
     var slice = slices[i];
-    var addedCount = slice['addedCount'];
-    var removed = slice['removed'];
-    var index = slice['index'];
+    var addedCount = slice.addedCount;
+    var removed = slice.removed;
+    var index = slice.index;
 
     // First perform removals.
     for (var j = index; j < index + removed.length; j++) {

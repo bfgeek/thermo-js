@@ -1,5 +1,6 @@
 goog.provide('thermo.Scheduler');
 
+goog.require('goog.asserts');
 goog.require('goog.events');
 
 
@@ -37,6 +38,12 @@ thermo.Scheduler = function() {
 
   /** @private {!Array.<function()>} */
   this.nonUserJobs_ = [];
+
+  /** @private {!Object.<function()>} */
+  this.checkJobsMap_ = {};
+
+  /** @private {!Array.<function()>} */
+  this.checkJobs_ = [];
 };
 
 
@@ -71,6 +78,34 @@ thermo.Scheduler.raf_ =
  */
 thermo.Scheduler.prototype.setBlockDomJobs = function(blockDomJobs) {
   this.blockDomJobs_ = blockDomJobs;
+};
+
+
+/**
+ * Adds a job which should be executed on every frame (for polling objects for
+ * any changes).
+ * @param {function()} checkJob
+ * @param {string} id
+ */
+thermo.Scheduler.prototype.addCheckJob = function(checkJob, id) {
+  this.checkJobsMap_[id] = checkJob;
+  this.checkJobs_.push(checkJob);
+};
+
+
+/**
+ * Removed a check job by id.
+ * @param {string} id
+ */
+thermo.Scheduler.prototype.removeCheckJob = function(id) {
+  // Remove from map.
+  var checkJob = this.checkJobsMap_[id];
+  delete this.checkJobsMap_[id];
+
+  // Remove from array.
+  var idx = this.checkJobs_.indexOf(checkJob);
+  goog.asserts.assert(idx != -1);
+  this.checkJobs_.splice(idx, 1);
 };
 
 
@@ -206,6 +241,10 @@ thermo.Scheduler.prototype.run_ = function(time) {
   }
   this.eventJobs_ = [];
 
+  for (var i = 0; i < this.checkJobs_.length; i++) {
+    this.checkJobs_[i]();
+  }
+
   this.phase_ = phaseType.ANIMATION;
   var idx = this.animationJobs_.length;
   while (idx--) {
@@ -217,6 +256,7 @@ thermo.Scheduler.prototype.run_ = function(time) {
   // Check if we've got an early opt-out enabled for
   if (this.animationJobs_.length && this.blockDomJobs_) {
     this.phase_ = phaseType.END;
+    this.requestFrame_();
     return;
   }
 
